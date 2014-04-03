@@ -95,6 +95,12 @@ class TC_Win32_Sound < Test::Unit::TestCase
     assert_not_respond_to(Sound, :midiOutGetNumDevs)
     assert_not_respond_to(Sound, :auxGetNumDevs)
     assert_not_respond_to(Sound, :mixerGetNumDevs)
+    assert_not_respond_to(Sound, :waveOutOpen)
+    assert_not_respond_to(Sound, :waveOutPrepareHeader)
+    assert_not_respond_to(Sound, :waveOutWrite)
+    assert_not_respond_to(Sound, :waveOutUnprepareHeader)
+    assert_not_respond_to(Sound, :waveOutClose)
+    
   end
 
   def teardown

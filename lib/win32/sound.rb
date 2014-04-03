@@ -1,7 +1,11 @@
 require 'ffi'
+require_relative 'mmlib-structs'
 
 # The Win32 module serves as a namespace only.
 module Win32
+
+  WAVE_FORMAT_PCM = 1
+  WAVE_MAPPER = -1
 
   # The Sound class encapsulates various methods for playing sound as well
   # as querying or configuring sound related properties.
@@ -13,6 +17,7 @@ module Win32
     typedef :ulong, :dword
     typedef :uintptr_t, :hmodule
     typedef :uintptr_t, :hwaveout
+    typedef :uint, :mmresult
 
     ffi_lib :kernel32
 
@@ -29,15 +34,22 @@ module Win32
     attach_function :midiInGetNumDevs, [], :int
     attach_function :auxGetNumDevs, [], :int
     attach_function :mixerGetNumDevs, [], :int
+    attach_function :waveOutOpen, [:pointer, :uint, :pointer, :dword, :dword, :dword], :mmresult
+    attach_function :waveOutPrepareHeader, [:hwaveout, :pointer, :uint], :mmresult
+    attach_function :waveOutWrite, [:hwaveout, :pointer, :uint], :mmresult
+    attach_function :waveOutUnprepareHeader, [:hwaveout, :pointer, :uint], :mmresult
+    attach_function :waveOutClose, [:hwaveout], :mmresult
 
     private_class_method :Beep, :PlaySound, :waveOutSetVolume, :waveOutGetVolume
     private_class_method :waveInGetNumDevs, :waveOutGetNumDevs, :midiOutGetNumDevs
     private_class_method :midiInGetNumDevs, :auxGetNumDevs, :mixerGetNumDevs
+    private_class_method :waveOutOpen, :waveOutPrepareHeader, :waveOutWrite
+    private_class_method :waveOutUnprepareHeader, :waveOutClose
 
     public
 
     # The version of the win32-sound library
-    VERSION = '0.5.1'
+    VERSION = '0.6.0'
 
     LOW_FREQUENCY  = 37
     HIGH_FREQUENCY = 32767
@@ -215,7 +227,7 @@ module Win32
 
       [low_word(volume), high_word(volume)]
     end
-
+    
     class << self
       alias get_wave_volume wave_volume
     end
@@ -229,5 +241,6 @@ module Win32
     def self.high_word(num)
       num >> 16
     end
+    
   end
 end
